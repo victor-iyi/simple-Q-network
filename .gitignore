@@ -22,3 +22,7 @@ __pycache__/
 *.DS_Store
 # Thumbnails
 ._*
+
+
+### Model
+saved/
