@@ -92,7 +92,7 @@ if __name__ == '__main__':
         # evaluate current generation
         scores = [eval_policy(env, p) for p in policies]
         print(f'Generation {gen+1:,} Max score = {max(scores):.2f}')
-        # Select n_fittest best policies
+        # Select n_fittest best policies (Selection)
         rank_idx = list(reversed(np.argsort(scores)))
         fittest = [policies[idx] for idx in rank_idx[:n_fittest]]
         selection_prob = np.array(scores) / np.sum(scores)
