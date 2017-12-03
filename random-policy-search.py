@@ -71,7 +71,7 @@ if __name__ == '__main__':
     env_name = 'CartPole-v0'
     env = gym.make(env_name)
     # Generate random policies
-    n_policy = 500
+    n_policy = 1000
     policies = [gen_random_policy() for _ in range(n_policy)]
     # Score of each policy
     scores = [run_episode(env, p) for p in policies]
