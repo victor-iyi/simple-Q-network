@@ -42,7 +42,16 @@ def eval_policy(env, policy, episodes=100):
 
 def crossover(first, second):
     """
-    Cross over
+    Pairs from the selected parents are merged to
+     generate new offspring child solution.
+
+     Crossover can happen in different forms, simplest
+     form is the one-point crossover which splits the
+     string representation of each solutions into two
+     parts at the same position, then concatenate the
+     first part of one solution with the second part
+     of the second one to form the offspring solution
+     representation.
 
     :param first:
         First parent (dad)
@@ -60,7 +69,13 @@ def crossover(first, second):
 
 def mutation(offspring, p=0.05):
     """
-    Mutation.
+    In biology, mutation happens with low
+    probability where a child can have a
+    feature that was not inherited from the parents.
+
+    Likewise, in genetic algorithm mutation step
+    perturbs the offspring solution with very
+    small probability.
 
     :param offspring:
         Offspring to be mutated
@@ -74,6 +89,7 @@ def mutation(offspring, p=0.05):
         if np.random.choice(4) < p:
             mutated[i] = np.random.choice(4)
     return mutated
+
 
 if __name__ == '__main__':
     env_name = 'FrozenLake-v0'
