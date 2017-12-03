@@ -31,14 +31,14 @@ ___
 
 **Policy (π):** The is the solution to the MDP i.e. it is a function that takes in a state & returns an action `π(s)->a`
 
-**The Bellmans Equation:**
+**The Bellman's Equation:**
 
 $$ Q(s,a) = r + \gamma max_a(Q(s', a')) $$
 
 ___
 ## Model-Based Reinforcement Learning
 
-Navigating the OpenAI's FrozenLake environment using two model-based reinforcement leaerning techniques:
+Navigating the OpenAI's FrozenLake environment using two model-based reinforcement learning techniques:
 
 - Value Iteration &
 - Policy Iteration
@@ -47,7 +47,7 @@ Navigating the OpenAI's FrozenLake environment using two model-based reinforceme
 
 Value iteration is ...
 
-Pseudocode:
+Pseudo-code:
 
 ```
 choose initial estimate of optimal value function
@@ -72,7 +72,7 @@ ___
 
 Policy iteration is ...
 
-Pseudocode:
+Pseudo-code:
 
 ```
 choose initial policy & value function
