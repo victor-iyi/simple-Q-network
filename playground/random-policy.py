@@ -40,7 +40,7 @@ def policy_to_action(obs, policy):
 
 def run_episode(env, policy, T=5000, render=False):
     """
-    Run episode for 1k timesteps.
+    Run episode for 5k timesteps.
 
     :param env: object
         OpenAI initialized environment object
