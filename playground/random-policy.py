@@ -79,5 +79,6 @@ if __name__ == '__main__':
     # Best score/policy
     best_score = max(scores)
     best_policy = policies[scores.index(best_score)]
-
+    print(f'Best score = {best_score}')
+    print('Running actions from the best policy...')
     run_episode(env, best_policy, render=True)
