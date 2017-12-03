@@ -67,6 +67,14 @@ def run_episode(env, policy, T=5000, render=False):
             break
     return total_reward
 
+
+def evaluate_policy(env, policy, episodes=100):
+    total_rewards = 0
+    for _ in range(episodes):
+        total_rewards += run_episode(env, policy, T=episodes)
+    return total_rewards / episodes
+
+
 if __name__ == '__main__':
     env_name = 'CartPole-v0'
     env = gym.make(env_name)
@@ -78,7 +86,8 @@ if __name__ == '__main__':
     # Best score/ policy
     best_score = max(scores)
     best_policy = policies[scores.index(best_score)]
+    policy_eval = evaluate_policy(env, best_policy)
 
     print(f'Best Score = {best_score}')
-    print(f'Running with best policy...')
+    print(f'Running best policy with {policy_eval:.2f}% accuracy...')
     run_episode(env, best_policy, render=True)
