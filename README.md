@@ -11,7 +11,7 @@ _by Victor I. Afolabi_
   * reward
   * transition function
   * policy
-  * the bellmans equation
+  * the Bellman's equation
 
 - [Model-Based Reinforcement Learning](#model-based-reinforcement-learning)
   * [value iteration](#value-iteration)
