@@ -58,4 +58,3 @@ if __name__ == '__main__':
         scores = [eval_policy(env, p) for p in policies]
         print(f'Generation {gen+1:,} Max score = {max(scores)}')
         # 2. Selection: Select the fittest policy
-
