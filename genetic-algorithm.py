@@ -83,14 +83,14 @@ def mutation(offspring, p=0.05):
         Offspring to be mutated
     :param p:
         Probability of mutation
-    :return: mutated
-        Maybe mutated offspring
+    :return: mutant
+        Mutated offspring/mutant
     """
-    mutated = np.copy(offspring)
+    mutant = np.copy(offspring)
     for i in range(len(offspring)):
         if np.random.choice(4) < p:
-            mutated[i] = np.random.choice(4)
-    return mutated
+            mutant[i] = np.random.choice(4)
+    return mutant
 
 
 if __name__ == '__main__':
@@ -122,10 +122,11 @@ if __name__ == '__main__':
                                 policies[np.random.choice(range(n_policies), p=selection_prob)])
                       for _ in range(n_policies - n_fittest)]
         # 4. Mutation:
-        mutated = [mutation(offspring) for offspring in offsprings]
-        # Update the population and add on crossed-over/mutated offsprings
+        mutant = [mutation(offspring) for offspring in offsprings]
+        # Update the population and add on crossed-over/mutant
         policies = fittest
-        policies += mutated
+        policies += mutant
+
     time_taken = time.time() - start
     # Evaluate the best policy after crossover & mutation
     scores = [eval_policy(env, policy) for policy in policies]

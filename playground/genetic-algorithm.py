@@ -7,26 +7,28 @@
   
   Copyright © 2017. Victor. All rights reserved.
 """
+import time
+
 import gym
 import numpy as np
 
 
-def gen_policies():
-    return np.random.choice(4, size=[16])
+def gen_policies(states, actions):
+    return np.random.choice(actions, size=[states])
 
 
-def policy_to_action(obs, policy):
-    return policy[obs]
+def policy_to_action(policy, state):
+    return policy[state]
 
 
 def run_episode(env, policy, T=1000, render=False):
-    obs = env.reset()
     total_rewards = 0
+    state = env.reset()
     for _ in range(T):
         if render:
             env.render()
-        action = policy_to_action(obs, policy)
-        obs, reward, done, _ = env.step(action)
+        action = policy_to_action(policy, state)
+        state, reward, done, _ = env.step(action)
         total_rewards += reward
         if done:
             break
@@ -40,24 +42,42 @@ def eval_policy(env, policy, episodes=100):
     return total_rewards / episodes
 
 
+def crossover(first, second, p=0.5):
+    offspring = np.copy(first)
+    for i in range(len(offspring)):
+        if np.random.uniform() < p:
+            offspring[i] = second[i]
+    return offspring
+
+
+def mutate(offspring, action, p=0.05):
+    mutant = np.copy(offspring)
+    for i in range(len(mutant)):
+        if np.random.choice(action) < p:
+            mutant[i] = np.random.choice(action)
+    return mutant
+
+
 if __name__ == '__main__':
-    env_name = 'MountainLake-v0'
+    env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
-    # seeding random number
-    np.random.seed(0)
+    # Seed random numbers
     env.seed(0)
+    np.random.seed(0)
+    n_states = env.observation_space.n
+    n_actions = env.action_space.n
     # Hyperparameters
-    n_policies = 500
-    n_generations = 20
-    n_fittest = 5
-    # Generate a policy
-    policies = [gen_policies() for _ in range(n_policies)]
-    # Genetic Algorithm: Loop though each generations...
+    n_policies = 200
+    n_generations = 10
+    n_fittest = 10
+    # Loop thought the population
+    start = time.time()
+    policies = [gen_policies(n_states, n_actions) for _ in range(n_policies)]
     for gen in range(n_generations):
-        # 1. Evaluation: Evaluate population
-        scores = [eval_policy(env, p) for p in policies]
-        print(f'Generation {gen+1:,} Max score = {max(scores)}')
-        # 2. Selection: Select the fittest policy
+        # Evaluate the population
+        scores = [eval_policy(env, policy) for policy in policies]
+        print(f'Generation {gen+1:,}\tScore = {max(scores):.2%}')
+        # Select n best
         rank_idx = list(reversed(np.argsort(scores)))
-        fittest = [policies[idx] for idx in rank_idx[:n_fittest]]
-        prob = np.array(scores) / np.sum(scores)
+        fittest = [policies[idx] for idx in rank_idx]
+        # Crossover
