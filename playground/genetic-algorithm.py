@@ -59,7 +59,7 @@ def mutate(offspring, action, p=0.05):
 
 
 if __name__ == '__main__':
-    env_name = 'FrozenLake8x8-v0'
+    env_name = 'CartPole-v0'
     env = gym.make(env_name)
     # Seed random numbers
     env.seed(0)
