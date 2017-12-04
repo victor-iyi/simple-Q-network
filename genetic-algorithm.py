@@ -117,5 +117,11 @@ if __name__ == '__main__':
                                 policies[np.random.choice(range(n_policies), p=selection_prob)])
                       for _ in range(n_policies - n_fittest)]
         # 4. Mutation:
-
-        # Update the population
+        mutated = [mutation(offspring) for offspring in offsprings]
+        # Update the population and add on crossed-over/mutated offsprings
+        policies = fittest
+        policies += mutated
+    # Evaluate the best policy after crossover & mutation
+    scores = [eval_policy(env, policy) for policy in policies]
+    best_policy = policies[scores.index(max(scores))]
+    print(f'Best policy')
