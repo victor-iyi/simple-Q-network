@@ -105,17 +105,17 @@ if __name__ == '__main__':
     policies = [gen_policy() for _ in range(n_policies)]
     # Genetic Algorithm: loop through generation
     for gen in range(n_generations):
-        # Evaluate: the current generation (population)
+        # 1. Evaluate: the current generation (population)
         scores = [eval_policy(env, p) for p in policies]
         print(f'Generation {gen+1:,} Max score = {max(scores):.2f}')
-        # 1. Selection: Select n_fittest best policies
-        rank_idx = list(reversed(np.argsort(scores)))
+        # 2. Selection: Select n_fittest best policies
+        rank_idx = list(reversed(np.argsort(scores)))  # from highest to smallest
         fittest = [policies[idx] for idx in rank_idx[:n_fittest]]
-        selection_prob = np.array(scores) / np.sum(scores)
-        # Crossover: (returns n_policy - n_fittest) crossed-over offsprings
+        selection_prob = np.array(scores) / np.sum(scores)  # Convert into probability
+        # 3.Crossover: (returns n_policy - n_fittest) crossed-over offsprings
         offsprings = [crossover(policies[np.random.choice(range(n_policies), p=selection_prob)],
                                 policies[np.random.choice(range(n_policies), p=selection_prob)])
                       for _ in range(n_policies - n_fittest)]
-        # Mutation:
+        # 4. Mutation:
 
         # Update the population
