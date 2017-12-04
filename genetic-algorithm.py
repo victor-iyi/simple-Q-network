@@ -7,6 +7,8 @@
   
   Copyright © 2017. Victor. All rights reserved.
 """
+import time
+
 import gym
 import numpy as np
 
@@ -20,7 +22,7 @@ def policy_to_action(obs, policy):
 
 
 def run_episode(env, policy, T=1000, render=False):
-    obs = env.render()
+    obs = env.reset()
     total_rewards = 0
     for _ in range(T):
         if render:
@@ -94,6 +96,8 @@ def mutation(offspring, p=0.05):
 if __name__ == '__main__':
     env_name = 'FrozenLake-v0'
     env = gym.make(env_name)
+    n_states = env.observation_space.n
+    n_actions = env.action_space.n
     # seed random numbers
     np.random.seed(0)
     env.seed(0)
@@ -104,6 +108,7 @@ if __name__ == '__main__':
     # initial random policy (population)
     policies = [gen_policy() for _ in range(n_policies)]
     # Genetic Algorithm: loop through generation
+    start = time.time()
     for gen in range(n_generations):
         # 1. Evaluate: the current generation (population)
         scores = [eval_policy(env, p) for p in policies]
@@ -121,7 +126,10 @@ if __name__ == '__main__':
         # Update the population and add on crossed-over/mutated offsprings
         policies = fittest
         policies += mutated
+    time_taken = time.time() - start
     # Evaluate the best policy after crossover & mutation
     scores = [eval_policy(env, policy) for policy in policies]
-    best_policy = policies[scores.index(max(scores))]
-    print(f'Best policy')
+    best_score = max(scores)
+    best_policy = policies[scores.index(best_score)]
+    print(f'\nBest policy score = {max(scores):.2f}. Time taken: {time_taken:4.4f}')
+    run_episode(env, best_policy, render=True)
