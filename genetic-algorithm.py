@@ -46,16 +46,14 @@ def crossover(first, second):
     """
     Pairs from the selected parents are merged to
      generate new offspring child solution.
-
-     Crossover can happen in different forms, simplest
+          Crossover can happen in different forms, simplest
      form is the one-point crossover which splits the
      string representation of each solutions into two
      parts at the same position, then concatenate the
      first part of one solution with the second part
      of the second one to form the offspring solution
      representation.
-
-    :param first:
+         :param first:
         First parent (dad)
     :param second:
         Second parent (mom)
@@ -74,12 +72,10 @@ def mutation(offspring, p=0.05):
     In biology, mutation happens with low
     probability where a child can have a
     feature that was not inherited from the parents.
-
-    Likewise, in genetic algorithm mutation step
+        Likewise, in genetic algorithm mutation step
     perturbs the offspring solution with very
     small probability.
-
-    :param offspring:
+        :param offspring:
         Offspring to be mutated
     :param p:
         Probability of mutation
@@ -126,8 +122,7 @@ if __name__ == '__main__':
         # Update the population and add on crossed-over/mutant
         policies = fittest
         policies += mutant
-
-    time_taken = time.time() - start
+        time_taken = time.time() - start
     # Evaluate the best policy after crossover & mutation
     scores = [eval_policy(env, policy) for policy in policies]
     best_score = max(scores)
