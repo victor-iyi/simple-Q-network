@@ -81,8 +81,15 @@ def eval_policy(env, policy, **kwargs):
     return np.mean(scores)
 
 
+def value_iteration(env, n_states, n_actions, **kwargs):
+    return []
+
+
 if __name__ == '__main__':
     # Environment
     env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
     # Hyperparameters
+    n_states = env.observation_space.n
+    n_actions = env.action_space.n
+    optimal_values = value_iteration(env, n_states, n_actions)
