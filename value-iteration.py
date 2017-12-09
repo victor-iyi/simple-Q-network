@@ -13,123 +13,96 @@ import gym
 import numpy as np
 
 
-def optimal_policy(state, policy):
-    """
-    Returns the action to take given a policy
-    :param state: int
-        Current state of the agent.
-    :param policy: array
-        The policy to pick actions from.
-    :return: action int
-        The optimal action given a state and policy
-
-    """
-    return int(policy[state])
+def policy_to_action(state, policy):
+    return policy[state]
 
 
-def eval_policy(env, policy, **kwargs):
-    """
-    Evaluate how good a policy is
-
-    :param env: object
-        Initialized OpenAI's gym environment.
-    :param policy: array
-        The policy to be followed by the agent
-    :param kwargs:
-        :gamma float default 0.5
-            Discount factor
-        :episodes int default 100
-            Number of episodes to play.
-    :return:
-    """
-    # keyword arguments
-    gamma = kwargs.get('gamma', default=0.5)
-    episodes = kwargs.get('episodes', default=100)
-    scores = [run_episode(env, policy, gamma, T=episodes)
-              for _ in range(episodes)]
-    return np.mean(scores)
-
-
-def run_episode(env, policy, gamma=0.5, T=1000, render=False):
-    """
-    Run episodes for `T` timesteps
-
-    :param env: object
-        Initialized OpenAI's gym environment
-    :param policy: array
-        `n_states` dimensional array. The policy the agent
-        should follow
-    :param gamma:float
-        Discount factor.
-    :param T: int default 10k
-        Times steps to run episodes.
-    :param render: boolean default False
-        Turn rendering on/off
-    :return: rewards
-        The total accumulated discounted reward
-    """
-    rewards = 0
+def run_episode(env, policy, **kwargs):
+    T = kwargs.get('T', 1000)
+    gamma = kwargs.get('gamma', 0.99)
+    render = kwargs.get('render', False)
     state = env.reset()
+    total_rewards = 0
 
     for t in range(T):
         if render:
             env.render()
-        action = optimal_policy(state, policy)
+        action = policy_to_action(state, policy)
         state, reward, done, _ = env.step(action)
-        rewards += (pow(gamma, t) * reward)
+        total_rewards += pow(gamma, t) * reward
         if done:
             break
-    return rewards
+    return total_rewards
 
 
-def value_iteration(env, n_states, n_actions, **kwargs):
-    """
-    Value iteration algorithm
+def eval_policy(env, policy, **kwargs):
+    episode = kwargs.get('episode', 100)
+    scores = [run_episode(env, policy, T=episode, **kwargs)
+              for _ in range(episode)]
+    return np.mean(scores)
 
-    :param env: object
-        Initialized OpenAI gym environment
-    :param n_states: int
-        Number of states
-    :param n_actions:
-        Number of actions
-    :param kwargs:
-        :gamma - float
-            Discount factor
-        :eps - float
-            Epsilon for Epsilon Greedy exploration
-        :max_iter - int default 10k
-            Maximum number of iteration
-    :return: V n_sates dimensional array
-     Optimal Value of being in a state
-    """
+
+def value_function(env, n_states, n_actions, **kwargs):
     # Keyword arguments
-    gamma = kwargs.get('gamma', default=0.5)
-    eps = kwargs.get('eps', default=1e-20)
-    max_iter = kwargs.get('max_iter', default=10000)
-    # Values of being in a state
-    V = np.zeros(n_states)
+    eps = kwargs.get('eps', 1e-20)
+    gamma = kwargs.get('gamma', 0.99)
+    max_iter = kwargs.get('max_iter', 10000)
+    # The Value says how good is it for an agent to be in a
+    # particular state.
+    V = np.zeros(shape=[n_states])
     for t in range(max_iter):
-        prev_v = np.copy(V)
+        # Copy over the Value at the previous time step
+        prev_V = np.copy(V)
+        # Calculate the value for each state
         for s in range(n_states):
-            # env.P[s][a] = transition function of being in a state
-            # and taking an action.
-            # it returns (probability, new_state, reward, info)
-            Q_sa = [sum([p * (r + pow(gamma, t) * prev_v[s_])
-                         for p, s_, r, _ in env.env.P[s][a]])
-                    for a in range(n_actions)]
-            V[s] = np.max(Q_sa)
-        if np.sum(np.fabs(prev_v - V)) <= eps:
-            sys.stdout.write('\rValue iteration converged at {i+1:}')
+            # Estimate how good it is to take an action in the current state
+            V_sa = np.zeros(n_actions)  # value for taking n different actions
+            for a in range(n_actions):
+                # transition = [probability, next_state, reward, done]
+                for transition in env.env.P[s][a]:
+                    p, s_, r, _ = transition
+                    # Expected future reward: ∑(E[r + µ*Q[s']])
+                    V_sa[a] += p * (r + gamma * prev_V[s_])
+            # Value of this state is the one that:
+            # maximizes the value of the action taken in this state.
+            V[s] = np.max(V_sa)
+        # Convergence: The difference between the previous value and current value
+        # is infinitesimally small i.e. difference is less than 1e-20, then break!
+        if np.sum(np.fabs(prev_V - V)) <= eps:
+            sys.stdout.write(f'\rValue iteration converged at {t+1:,} iteration')
             sys.stdout.flush()
+            break
     return V
 
 
+def extract_policy(env, value, n_states, n_actions, **kwargs):
+    gamma = kwargs.get('gamma', 0.99)
+    policy = np.zeros(shape=[n_states])
+    for s in range(n_states):
+        V_sa = np.zeros(shape=[n_actions])
+        for a in range(n_actions):
+            # transition = [probability, new_state, reward, done]
+            for transition in env.env.P[s][a]:
+                p, s_, r, _ = transition
+                # Expected future reward: ∑(E[r + µ*Q[s']])
+                V_sa[a] += p * (r + gamma * value[s_])
+        # Best policy for this state is the index of the one that:
+        # maximizes the value of being in this state and taken various actions.
+        policy[s] = np.argmax(V_sa)
+    return policy
+
+
 if __name__ == '__main__':
+    # Open AI's FrozenLake environment
     env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
+
     # Hyperparameters
-    n_states = env.observation_space.n
     n_actions = env.action_space.n
-    gamma = 0.5
-    # Get the optimal value function
-    optimal_values = value_iteration(env, n_states, n_actions)
+    n_states = env.observation_space.n
+    print(f'{env_name} has {n_states} states & {n_actions} actions.')
+    episodes = 1000  # horizon
+    optimal_value = value_function(env, n_states, n_actions)
+    policy = extract_policy(env, optimal_value, n_states, n_actions)
+    scores = eval_policy(env, policy, episode=episodes)
+    print(f'\nAverage after {episodes:,} games = {scores:.2f}')
