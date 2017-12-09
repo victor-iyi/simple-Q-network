@@ -98,11 +98,15 @@ if __name__ == '__main__':
     env = gym.make(env_name)
 
     # Hyperparameters
+    episodes = 1000
     n_actions = env.action_space.n
     n_states = env.observation_space.n
     print(f'{env_name} has {n_states} states & {n_actions} actions.')
-    episodes = 1000  # horizon
+
+    # Model
     optimal_value = value_function(env, n_states, n_actions)
     policy = extract_policy(env, optimal_value, n_states, n_actions)
     scores = eval_policy(env, policy, episode=episodes)
+
+    # Logging
     print(f'\nAverage after {episodes:,} games = {scores:.2f}')
