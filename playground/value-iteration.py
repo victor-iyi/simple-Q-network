@@ -38,7 +38,7 @@ def value_function(env, n_states, n_actions, **kwargs):
     # Keyword arguments
     eps = kwargs.get('eps', 1e-20)
     gamma = kwargs.get('gamma', 0.99)
-    max_iter = kwargs.get('max_iter', 1000)
+    max_iter = kwargs.get('max_iter', 10000)
     V = np.zeros(shape=[n_states])
     for t in range(max_iter):
         v = np.copy(V)
@@ -51,7 +51,7 @@ def value_function(env, n_states, n_actions, **kwargs):
                     V_sa[a] += p * (r + gamma * v[s_])
             V[s] = np.max(V_sa)
         # Convergence
-        if np.sum(np.fabs(V - v)) <= eps:
+        if np.sum(np.fabs(v - V)) <= eps:
             print(f'Solution found at {t+1:,} iteration')
             break
     return V
@@ -71,6 +71,7 @@ def extract_policy(env, value, n_states, n_actions, **kwargs):
     return policy
 
 if __name__ == '__main__':
+    # Environment.
     env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
     # Hyperparameters
