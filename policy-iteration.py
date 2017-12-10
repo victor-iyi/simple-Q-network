@@ -69,6 +69,9 @@ def policy_to_value(env, policy, n_states, **kwargs):
     return V
 
 
+def policy_iteration(env, n_states, n_actions, **kwargs):
+    gamma = kwargs.get('gamma', 0.99)
+
 if __name__ == '__main__':
     env_name = 'frozenLake8x8-v0'
     env = gym.make(env_name)
