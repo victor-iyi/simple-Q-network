@@ -150,7 +150,8 @@ while True:
 
         # boring book-keeping
         running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
-        print('resetting env. episode reward total was %f. running mean: %f' % (reward_sum, running_reward))
+        print(f'\nResetting env. episode reward total was {reward_sum:.2f}. '
+              f'running mean: {running_reward:.3f}')
         if episode_number % 100 == 0:
             pickle.dump(model, open(saved_model, 'wb'))
         reward_sum = 0
@@ -159,5 +160,6 @@ while True:
 
     if reward != 0:  # Pong has either +1 or -1 reward exactly when game ends.
         # print(f'ep %d: game finished, reward: %f' % (episode_number, reward)) + ('' if reward == -1 else ' !!!!!!!!')
-        print('ep {}: game finished, reward: {:.2f}{}'.format(
+        sys.stdout.write('\rep {}: game finished, reward: {:.2f}{}'.format(
             episode_number, reward, '' if reward == -1 else '!!!!!!!!'))
+        sys.stdout.flush()
