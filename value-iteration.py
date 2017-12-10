@@ -19,7 +19,6 @@ def policy_to_action(state, policy):
 
 def run_episode(env, policy, **kwargs):
     T = kwargs.get('T', 1000)
-    gamma = kwargs.get('gamma', 0.99)
     render = kwargs.get('render', False)
     state = env.reset()
     total_rewards = 0
@@ -29,16 +28,15 @@ def run_episode(env, policy, **kwargs):
             env.render()
         action = policy_to_action(state, policy)
         state, reward, done, _ = env.step(action)
-        total_rewards += pow(gamma, t) * reward
+        total_rewards += reward
         if done:
             break
     return total_rewards
 
 
-def eval_policy(env, policy, **kwargs):
-    episode = kwargs.get('episode', 100)
-    scores = [run_episode(env, policy, T=episode, **kwargs)
-              for _ in range(episode)]
+def eval_policy(env, policy, episodes=100):
+    scores = [run_episode(env, policy, T=episodes)
+              for _ in range(episodes)]
     return np.mean(scores)
 
 
@@ -106,7 +104,7 @@ if __name__ == '__main__':
     # Model
     optimal_value = value_function(env, n_states, n_actions)
     policy = extract_policy(env, optimal_value, n_states, n_actions)
-    scores = eval_policy(env, policy, episode=episodes)
+    scores = eval_policy(env, policy, episodes=episodes)
 
     # Logging
-    print(f'\nAverage after {episodes:,} games = {scores:.2f}')
+    print(f'\nAverage after {episodes:,} games = {scores:.2%}')
