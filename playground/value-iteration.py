@@ -58,6 +58,19 @@ def value_function(env, n_states, n_actions, **kwargs):
     return V
 
 
+def extract_policy(env, value, n_states, n_actions, **kwargs):
+    gamma = kwargs.get('gamma', 0.99)
+    # Policy from the utility/value
+    policy = np.zeros(shape=[n_states])
+    for s in range(n_states):
+        V_sa = np.zeros(shape=[n_actions])
+        for a in range(n_actions):
+            for transition in env.env.P[s][a]:
+                p, s_, r, _ = transition
+                V_sa[a] += p * (r + gamma * value[s])
+        policy[s] = np.argmax(V_sa)
+    return policy
+
 if __name__ == '__main__':
     env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
@@ -65,5 +78,7 @@ if __name__ == '__main__':
     n_states = env.observation_space.n
     n_actions = env.action_space.n
     # The Model
-    optimal_policy = value_function(env, n_states, n_actions)
-    score = eval_policy(env, optimal_policy)
+    value = value_function(env, n_states, n_actions)
+    policy = extract_policy(env, value, n_states, n_actions)
+    score = eval_policy(env, policy)
+    print(f'Score = {score}')
