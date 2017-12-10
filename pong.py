@@ -20,7 +20,7 @@ batch_size = 10  # every how many episodes to do a param update?
 learning_rate = 1e-4
 gamma = 0.99  # discount factor for reward
 decay_rate = 0.99  # decay factor for RMSProp leaky sum of grad^2
-resume = False  # resume from previous checkpoint?
+resume = True  # resume from previous checkpoint?
 render = True
 
 # Environment
@@ -30,6 +30,7 @@ save_dir = f'saved/{env_name}/'
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 saved_model = os.path.join(save_dir, 'model.pkl')
+save_step = 50
 
 # model initialization
 D = 80 * 80  # input dimensionality: 80x80 grid
@@ -154,7 +155,7 @@ while True:
         running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
         print(f'\nResetting env. episode reward total was {reward_sum:.2f}. '
               f'running mean: {running_reward:.3f}')
-        if episode_number % 100 == 0:
+        if episode_number % save_step == 0:
             pickle.dump(model, open(saved_model, 'wb'))
         reward_sum = 0
         observation = env.reset()  # reset env
