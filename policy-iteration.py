@@ -37,21 +37,21 @@ def eval_policy(env, policy, episodes=100):
 
 
 def extract_policy(env, V, n_states, n_actions, **kwargs):
-    gamma = kwargs.get('gamma', 0.99)
+    gamma = kwargs.get('gamma', .99)
     policy = np.zeros(shape=[n_states])
     for s in range(n_states):
         V_sa = np.zeros(shape=[n_actions])
         for a in range(n_actions):
             for transition in env.env.P[s][a]:
-                p, r, s_, _ = transition
+                p, s_, r, _ = transition
                 V_sa[a] += p * (r + gamma * V[s_])
         policy[s] = np.argmax(V_sa)
     return policy
 
 
-def policy_to_value(env, policy, n_states, **kwargs):
+def extract_value(env, policy, n_states, **kwargs):
     gamma = kwargs.get('gamma', 0.99)
-    eps = kwargs.get('eps', 1e-20)
+    eps = kwargs.get('eps', 1e-10)
     max_iter = kwargs.get('max_iter', 10000)
     # Utility for following the policy
     V = np.zeros(shape=[n_states])
@@ -64,6 +64,8 @@ def policy_to_value(env, policy, n_states, **kwargs):
                 V[s] += p * (r + gamma * v[s_])
         # Convergence
         if np.sum(np.fabs(v - V)) <= eps:
+            sys.stdout.write(f'\rExtract value converged at {t+1:,} iter')
+            sys.stdout.flush()
             break
     return V
 
@@ -74,7 +76,7 @@ def policy_iteration(env, n_states, n_actions, **kwargs):
     # Initial random policy
     policy = np.random.choice(n_actions, size=[n_states])
     for t in range(max_iter):
-        old_policy = policy_to_value(env, policy, n_states, gamma=gamma)
+        old_policy = extract_value(env, policy, n_states, gamma=gamma)
         new_policy = extract_policy(env, old_policy, n_states, n_actions)
         if np.all(policy == new_policy):
             sys.stdout.write(f'\rPolicy iteration converged @ {t+1:,}')
@@ -84,7 +86,7 @@ def policy_iteration(env, n_states, n_actions, **kwargs):
     return policy
 
 if __name__ == '__main__':
-    env_name = 'frozenLake8x8-v0'
+    env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
     # Hyperparameters
     n_states = env.observation_space.n
