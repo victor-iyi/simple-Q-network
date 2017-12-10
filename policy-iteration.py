@@ -8,6 +8,7 @@
   Copyright © 2017. Victor. All rights reserved.
 """
 import sys
+
 import gym
 import numpy as np
 
@@ -63,14 +64,19 @@ def policy_to_value(env, policy, n_states, **kwargs):
                 V[s] += p * (r + gamma * v[s_])
         # Convergence
         if np.sum(np.fabs(v - V)) <= eps:
-            sys.stdout.write(f'\rPolicy\'s value converged @ {t+1:,}')
-            sys.stdout.flush()
             break
     return V
 
 
 def policy_iteration(env, n_states, n_actions, **kwargs):
     gamma = kwargs.get('gamma', 0.99)
+    max_iter = kwargs.get('max_iter', 10000)
+    # Initial random policy
+    policy = np.random.choice(n_actions, size=[n_states])
+    for t in range(max_iter):
+        old_policy = policy_to_value(env, policy, n_states, gamma=gamma)
+        new_policy = extract_policy(env, old_policy, n_states, n_actions)
+
 
 if __name__ == '__main__':
     env_name = 'frozenLake8x8-v0'

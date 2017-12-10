@@ -27,6 +27,8 @@ render = True
 env_name = 'Pong-v0'
 env = gym.make(env_name)
 save_dir = f'saved/{env_name}/'
+if not os.path.isdir(save_dir):
+    os.makedirs(save_dir)
 saved_model = os.path.join(save_dir, 'model.pkl')
 
 # model initialization
