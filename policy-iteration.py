@@ -76,7 +76,12 @@ def policy_iteration(env, n_states, n_actions, **kwargs):
     for t in range(max_iter):
         old_policy = policy_to_value(env, policy, n_states, gamma=gamma)
         new_policy = extract_policy(env, old_policy, n_states, n_actions)
-
+        if np.all(policy == new_policy):
+            sys.stdout.write(f'\rPolicy iteration converged @ {t+1:,}')
+            sys.stdout.flush()
+            break
+        policy = new_policy
+    return policy
 
 if __name__ == '__main__':
     env_name = 'frozenLake8x8-v0'
@@ -85,3 +90,7 @@ if __name__ == '__main__':
     n_states = env.observation_space.n
     n_actions = env.action_space.n
     episodes = 100
+    # Model
+    policy = policy_iteration(env, n_states, n_actions)
+    score = eval_policy(env, policy, episodes=episodes)
+    print(f'After {episodes:,} game accuracy = {score:.2f}')
