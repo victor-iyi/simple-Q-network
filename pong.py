@@ -163,6 +163,6 @@ while True:
 
     if reward != 0:  # Pong has either +1 or -1 reward exactly when game ends.
         # print(f'ep %d: game finished, reward: %f' % (episode_number, reward)) + ('' if reward == -1 else ' !!!!!!!!')
-        sys.stdout.write('\rep {}: game finished, reward: {:.2f}{}'.format(
+        sys.stdout.write('\rep {:,}: game finished, reward: {:.2f}{}'.format(
             episode_number, reward, '' if reward == -1 else '!!!!!!!!'))
         sys.stdout.flush()
