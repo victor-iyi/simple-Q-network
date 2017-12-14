@@ -102,7 +102,7 @@ def extract_value(env, policy, n_states, **kwargs):
                 V[s] += p * (r + gamma * v[s_])
         # convergence
         if np.sum(np.fabs(v - V)) <= eps:
-            sys.stdout.write(f'\rValue extraction convrged @ {t+1} iter')
+            sys.stdout.write(f'\rValue extraction converged @ {t+1} iter\n')
             sys.stdout.flush()
             break
     return V
