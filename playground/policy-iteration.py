@@ -7,6 +7,8 @@
   
   Copyright © 2017. Victor. All rights reserved.
 """
+import sys
+
 import gym
 import numpy as np
 
@@ -63,6 +65,48 @@ def eval_policy(env, policy, episodes=100):
     scores = [run_episode(env, policy, T=episodes)
               for _ in range(episodes)]
     return np.mean(scores)
+
+
+def extract_value(env, policy, n_states, **kwargs):
+    # keyword arguments
+    eps = kwargs.get('eps', 1e-10)
+    gamma = kwargs.get('gamma', 0.99)
+    max_iter = kwargs.get('max_iter', 1000)
+    V = np.zeros(shape=[n_states])
+    for t in range(max_iter):
+        v = np.copy(V)
+        # go through all states
+        for s in range(n_states):
+            a = policy[s]
+            for trans in env.P[s][a]:
+                p, s_, r, _ = trans
+                V[s] += p * (r + gamma * v[s_])
+                # convergence
+                if np.sum(np.fabs(v - V)) <= eps:
+                    sys.stdout.write(f'\rValue extraction convrged @ {t+1} iter')
+                    sys.stdout.flush()
+                    break
+    return V
+
+
+def extract_policy(env, V, n_states, n_actions, **kwargs):
+    policy = np.zeros(shape=[n_states])
+
+    return policy
+
+
+def policy_iteration(env, n_states, n_actions, **kwargs):
+    max_iter = kwargs.get('max_iter', 1000)
+    policy = np.random.choice(n_actions, size=[n_states])
+    for t in range(max_iter):
+        old_policy = extract_value(env, policy, n_states)
+        new_policy = extract_policy(env, old_policy, n_states, n_actions)
+        if np.all(old_policy == new_policy):
+            sys.stdout.write(f'\rPolicy iteration converged @ {t+1}')
+            sys.stdout.flush()
+            break
+
+    return policy
 
 
 if __name__ == '__main__':
