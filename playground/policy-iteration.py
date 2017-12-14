@@ -68,6 +68,25 @@ def eval_policy(env, policy, episodes=100):
 
 
 def extract_value(env, policy, n_states, **kwargs):
+    """
+    Extract the utility/value of a policy
+
+    :param env: object
+        Initialized OpenAI's gym environment
+    :param policy: ndarray
+        Policy to be extract it's utility
+    :param n_states: int
+        Total states as provided by the environment
+    :param kwargs:
+        :eps: float default 1e-10
+            For epsilon greedy exploration
+        :gamma: float default 0.99
+            (MDP) discount factor
+        :max_iter: int default 1k
+            Maximum iteration
+    :return: V
+        Value of the given policy
+    """
     # keyword arguments
     eps = kwargs.get('eps', 1e-10)
     gamma = kwargs.get('gamma', 0.99)
@@ -78,20 +97,27 @@ def extract_value(env, policy, n_states, **kwargs):
         # go through all states
         for s in range(n_states):
             a = policy[s]
-            for trans in env.P[s][a]:
+            for trans in env.env.P[s][a]:
                 p, s_, r, _ = trans
                 V[s] += p * (r + gamma * v[s_])
-                # convergence
-                if np.sum(np.fabs(v - V)) <= eps:
-                    sys.stdout.write(f'\rValue extraction convrged @ {t+1} iter')
-                    sys.stdout.flush()
-                    break
+        # convergence
+        if np.sum(np.fabs(v - V)) <= eps:
+            sys.stdout.write(f'\rValue extraction convrged @ {t+1} iter')
+            sys.stdout.flush()
+            break
     return V
 
 
 def extract_policy(env, V, n_states, n_actions, **kwargs):
+    gamma = kwargs.get('gamma', 0.99)
     policy = np.zeros(shape=[n_states])
-
+    for s in range(n_states):
+        V_sa = np.zeros(shape=[n_actions])
+        for a in range(n_actions):
+            for trans in env.env.P[s][a]:
+                p, s_, r, _ = trans
+                V_sa[a] += p * (r + gamma * V[s_])
+        policy[s] = np.argmax(V_sa)
     return policy
 
 
@@ -114,6 +140,11 @@ if __name__ == '__main__':
     env_name = 'FrozenLake8x8-v0'
     env = gym.make(env_name)
     # Hyperparameters
+    episodes = 100
     n_states = env.observation_space.n
     n_actions = env.action_space.n
     print(f'{env_name} has {n_states} states and {n_actions} possible actions')
+    # Policy iteration
+    policy = policy_iteration(env, n_states, n_actions)
+    score = eval_policy(env, policy, episodes=episodes)
+    print(f'After {episodes:,} episodes, acc = {score:.2f}')
