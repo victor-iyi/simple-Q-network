@@ -50,8 +50,8 @@ def extract_policy(env, V, n_states, n_actions, **kwargs):
 
 
 def extract_value(env, policy, n_states, **kwargs):
-    gamma = kwargs.get('gamma', 0.99)
     eps = kwargs.get('eps', 1e-10)
+    gamma = kwargs.get('gamma', 0.99)
     max_iter = kwargs.get('max_iter', 10000)
     # Utility for following the policy
     V = np.zeros(shape=[n_states])

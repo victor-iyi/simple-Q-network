@@ -127,11 +127,11 @@ def policy_iteration(env, n_states, n_actions, **kwargs):
     for t in range(max_iter):
         old_policy = extract_value(env, policy, n_states)
         new_policy = extract_policy(env, old_policy, n_states, n_actions)
-        if np.all(old_policy == new_policy):
+        if np.all(policy == new_policy):
             sys.stdout.write(f'\rPolicy iteration converged @ {t+1}')
             sys.stdout.flush()
             break
-
+        policy = new_policy
     return policy
 
 
