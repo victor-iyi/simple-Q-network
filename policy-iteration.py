@@ -36,19 +36,6 @@ def eval_policy(env, policy, episodes=100):
     return np.mean(scores)
 
 
-def extract_policy(env, V, n_states, n_actions, **kwargs):
-    gamma = kwargs.get('gamma', .99)
-    policy = np.zeros(shape=[n_states])
-    for s in range(n_states):
-        V_sa = np.zeros(shape=[n_actions])
-        for a in range(n_actions):
-            for transition in env.env.P[s][a]:
-                p, s_, r, _ = transition
-                V_sa[a] += p * (r + gamma * V[s_])
-        policy[s] = np.argmax(V_sa)
-    return policy
-
-
 def extract_value(env, policy, n_states, **kwargs):
     eps = kwargs.get('eps', 1e-10)
     gamma = kwargs.get('gamma', 0.99)
@@ -68,6 +55,19 @@ def extract_value(env, policy, n_states, **kwargs):
             sys.stdout.flush()
             break
     return V
+
+
+def extract_policy(env, V, n_states, n_actions, **kwargs):
+    gamma = kwargs.get('gamma', .99)
+    policy = np.zeros(shape=[n_states])
+    for s in range(n_states):
+        V_sa = np.zeros(shape=[n_actions])
+        for a in range(n_actions):
+            for transition in env.env.P[s][a]:
+                p, s_, r, _ = transition
+                V_sa[a] += p * (r + gamma * V[s_])
+        policy[s] = np.argmax(V_sa)
+    return policy
 
 
 def policy_iteration(env, n_states, n_actions, **kwargs):
