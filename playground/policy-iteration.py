@@ -14,6 +14,7 @@ import numpy as np
 def run_episode(env, policy, **kwargs):
     """
     Run a single episode for some time steps
+
     :param env: object
         Initialized OpenAI's gym environment.
     :param policy: ndarray
@@ -47,6 +48,18 @@ def run_episode(env, policy, **kwargs):
 
 
 def eval_policy(env, policy, episodes=100):
+    """
+    Evaluate the current policy
+
+    :param env: object
+        Initialized OpenAI's gym environment.
+    :param policy: ndarray
+        Policy to be followed by the Agent
+    :param episodes: int
+        Number of episodes to evaluate
+    :return:
+        mean accumulated reward
+    """
     scores = [run_episode(env, policy, T=episodes)
               for _ in range(episodes)]
     return np.mean(scores)
