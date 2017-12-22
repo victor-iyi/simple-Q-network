@@ -29,11 +29,13 @@ ___
 
 **Transition function `T(s,a,s´)` or `P(s´|s,a)`:** The probability that the agent is in a state `s`, performs an action `a` and ends up in another state `s´` (which could be the same state i.e `s≈s´`)
 
+
+
 **Policy (π):** The is the solution to the MDP i.e. it is a function that takes in a state & returns an action `π(s)->a`
 
 **The Bellman's Equation:**
 
-$$ Q(s,a) = r + \gamma max_a(Q(s', a')) $$
+$$ Q(s,a) = R(s, a) + \gamma max_a(Q(s', a')) $$
 
 ___
 ## Model-Based Reinforcement Learning
